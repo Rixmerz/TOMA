@@ -189,7 +189,9 @@ async function main() {
                 properties: {
                     minutes: { type: 'number', description: 'Minutes from now to execute the task' },
                     note: { type: 'string', description: 'Note/message for the scheduled task' },
-                    target_window: { type: 'string', description: 'Target window (default: tmux-orc:0)' }
+                    target_window: { type: 'string', description: 'Target window (default: tmux-orc:0)' },
+                    pm_session_name: { type: 'string', description: 'PM tmux session name (overrides target_window)' },
+                    pm_window_index: { type: 'number', description: 'PM tmux window index (default: 0)' }
                 },
                 required: ['minutes', 'note']
             }
@@ -201,7 +203,9 @@ async function main() {
                 type: 'object',
                 properties: {
                     session_name: { type: 'string', description: 'Name of the engineer session' },
-                    minutes: { type: 'number', description: 'Minutes from now (default: 30)' }
+                    minutes: { type: 'number', description: 'Minutes from now (default: 30)' },
+                    pm_session_name: { type: 'string', description: 'PM tmux session name where notification should be sent' },
+                    pm_window_index: { type: 'number', description: 'PM tmux window index (default: 0)' }
                 },
                 required: ['session_name']
             }
@@ -212,7 +216,9 @@ async function main() {
             inputSchema: {
                 type: 'object',
                 properties: {
-                    minutes: { type: 'number', description: 'Minutes from now (default: 15)' }
+                    minutes: { type: 'number', description: 'Minutes from now (default: 15)' },
+                    pm_session_name: { type: 'string', description: 'PM tmux session name where notification should be sent' },
+                    pm_window_index: { type: 'number', description: 'PM tmux window index (default: 0)' }
                 },
                 required: []
             }
@@ -224,7 +230,9 @@ async function main() {
                 type: 'object',
                 properties: {
                     session_name: { type: 'string', description: 'Name of the engineer session' },
-                    minutes: { type: 'number', description: 'Minutes from now (default: 480 - 8 hours)' }
+                    minutes: { type: 'number', description: 'Minutes from now (default: 480 - 8 hours)' },
+                    pm_session_name: { type: 'string', description: 'PM tmux session name where notification should be sent' },
+                    pm_window_index: { type: 'number', description: 'PM tmux window index (default: 0)' }
                 },
                 required: ['session_name']
             }
@@ -503,43 +511,57 @@ async function main() {
                     const minutes = args?.minutes;
                     const note = args?.note;
                     const targetWindow = args?.target_window;
-                    const taskId = await scheduler.scheduleTask({ minutes, note, target_window: targetWindow });
+                    const pmSessionName = args?.pm_session_name;
+                    const pmWindowIndex = args?.pm_window_index;
+                    const taskId = await scheduler.scheduleTask({
+                        minutes,
+                        note,
+                        target_window: targetWindow,
+                        pm_session_name: pmSessionName,
+                        pm_window_index: pmWindowIndex
+                    });
                     return {
                         content: [{
                                 type: 'text',
-                                text: `Task scheduled successfully with ID: ${taskId}`
+                                text: `Task scheduled successfully with ID: ${taskId}. Notification will be sent to ${pmSessionName ? `${pmSessionName}:${pmWindowIndex || 0}` : targetWindow || 'default location'}.`
                             }]
                     };
                 }
                 case 'schedule_progress_review': {
                     const sessionName = args?.session_name;
                     const minutes = args?.minutes || 30;
-                    const taskId = await scheduler.scheduleProgressReview(sessionName, minutes);
+                    const pmSessionName = args?.pm_session_name;
+                    const pmWindowIndex = args?.pm_window_index;
+                    const taskId = await scheduler.scheduleProgressReview(sessionName, minutes, pmSessionName, pmWindowIndex);
                     return {
                         content: [{
                                 type: 'text',
-                                text: `Progress review scheduled for ${sessionName} in ${minutes} minutes. Task ID: ${taskId}`
+                                text: `Progress review scheduled for ${sessionName} in ${minutes} minutes. Task ID: ${taskId}. Notification will be sent to ${pmSessionName ? `${pmSessionName}:${pmWindowIndex || 0}` : 'default location'}.`
                             }]
                     };
                 }
                 case 'schedule_orchestrator_check': {
                     const minutes = args?.minutes || 15;
-                    const taskId = await scheduler.scheduleOrchestratorCheck(minutes);
+                    const pmSessionName = args?.pm_session_name;
+                    const pmWindowIndex = args?.pm_window_index;
+                    const taskId = await scheduler.scheduleOrchestratorCheck(minutes, pmSessionName, pmWindowIndex);
                     return {
                         content: [{
                                 type: 'text',
-                                text: `Orchestrator check scheduled in ${minutes} minutes. Task ID: ${taskId}`
+                                text: `Orchestrator check scheduled in ${minutes} minutes. Task ID: ${taskId}. Notification will be sent to ${pmSessionName ? `${pmSessionName}:${pmWindowIndex || 0}` : 'default location'}.`
                             }]
                     };
                 }
                 case 'schedule_engineer_standup': {
                     const sessionName = args?.session_name;
                     const minutes = args?.minutes || 480;
-                    const taskId = await scheduler.scheduleEngineerStandup(sessionName, minutes);
+                    const pmSessionName = args?.pm_session_name;
+                    const pmWindowIndex = args?.pm_window_index;
+                    const taskId = await scheduler.scheduleEngineerStandup(sessionName, minutes, pmSessionName, pmWindowIndex);
                     return {
                         content: [{
                                 type: 'text',
-                                text: `Engineer standup scheduled for ${sessionName} in ${minutes} minutes. Task ID: ${taskId}`
+                                text: `Engineer standup scheduled for ${sessionName} in ${minutes} minutes. Task ID: ${taskId}. Notification will be sent to ${pmSessionName ? `${pmSessionName}:${pmWindowIndex || 0}` : 'default location'}.`
                             }]
                     };
                 }

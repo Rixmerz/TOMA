@@ -20,8 +20,8 @@ export declare class Scheduler {
     getTask(taskId: string): ScheduledTask | undefined;
     getAllTasks(): ScheduledTask[];
     getActiveTasks(): ScheduledTask[];
-    scheduleProgressReview(sessionName: string, minutes?: number): Promise<string>;
-    scheduleOrchestratorCheck(minutes?: number): Promise<string>;
-    scheduleEngineerStandup(sessionName: string, minutes?: number): Promise<string>;
+    scheduleProgressReview(sessionName: string, minutes?: number, pmSessionName?: string, pmWindowIndex?: number): Promise<string>;
+    scheduleOrchestratorCheck(minutes?: number, pmSessionName?: string, pmWindowIndex?: number): Promise<string>;
+    scheduleEngineerStandup(sessionName: string, minutes?: number, pmSessionName?: string, pmWindowIndex?: number): Promise<string>;
 }
 //# sourceMappingURL=scheduler.d.ts.map
