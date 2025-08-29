@@ -1,6 +1,5 @@
 import { spawn } from 'child_process';
 import { writeFile } from 'fs/promises';
-import { join } from 'path';
 import { ScheduleOptions } from '@/types/tmux.js';
 
 export interface ScheduledTask {
@@ -23,7 +22,7 @@ export class Scheduler {
   }
 
   async scheduleTask(options: ScheduleOptions): Promise<string> {
-    const taskId = `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const taskId = `task_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
     const now = new Date();
     const executeAt = new Date(now.getTime() + options.minutes * 60 * 1000);
 
