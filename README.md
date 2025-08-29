@@ -147,10 +147,12 @@ await mcp.callTool('send_project_idea', {
 
 ### Scheduling Progress Reviews (PM-Only)
 ```typescript
-// PM schedules review in 30 minutes
+// PM schedules review in 30 minutes with proper session targeting
 await mcp.callTool('schedule_progress_review', {
   session_name: 'ingeniero-frontend',
-  minutes: 30
+  minutes: 30,
+  pm_session_name: 'pm-main',      // PM's actual tmux session
+  pm_window_index: 0               // PM's tmux window (default: 0)
 });
 ```
 
@@ -162,6 +164,56 @@ await mcp.callTool('broadcast_message', {
 });
 ```
 
+## PM Session Targeting
+
+### Problem Solved
+The original scheduling functionality had an architectural issue where scheduled tasks executed in isolation and couldn't properly communicate with tmux terminals where the PM was located.
+
+### Solution: PM Session Parameters
+All scheduling tools now accept optional PM session targeting parameters:
+
+- `pm_session_name`: The tmux session name where the PM is running
+- `pm_window_index`: The tmux window index where the PM is located (default: 0)
+
+### Enhanced Scheduling Tools
+```typescript
+// All scheduling tools now support PM session targeting:
+
+// Basic task scheduling
+await mcp.callTool('schedule_task', {
+  minutes: 15,
+  note: 'Check engineer progress',
+  pm_session_name: 'pm-main',
+  pm_window_index: 0
+});
+
+// Progress reviews
+await mcp.callTool('schedule_progress_review', {
+  session_name: 'ingeniero-backend',
+  minutes: 60,
+  pm_session_name: 'pm-main'
+});
+
+// Orchestrator checks
+await mcp.callTool('schedule_orchestrator_check', {
+  minutes: 30,
+  pm_session_name: 'pm-main'
+});
+
+// Engineer standups
+await mcp.callTool('schedule_engineer_standup', {
+  session_name: 'ingeniero-frontend',
+  minutes: 480,
+  pm_session_name: 'pm-main'
+});
+```
+
+### Benefits
+- ✅ **Fixed Isolation Issue**: Scheduled notifications now reach the correct PM location
+- ✅ **Improved Workflow**: Messages delivered to PM's actual tmux session/window
+- ✅ **Backward Compatible**: Optional parameters with sensible defaults
+- ✅ **Better Targeting**: PM session parameters override default target windows
+
 ## Migration from Original System
 
 TOMA replaces the original Tmux-Orchestrator workspace approach with several key improvements:
@@ -171,6 +223,7 @@ TOMA replaces the original Tmux-Orchestrator workspace approach with several key
 3. **Enhanced Automation**: Intelligent scheduling and monitoring tools
 4. **Better Communication**: Structured inter-agent communication
 5. **Simplified Architecture**: Single-window engineer sessions with internal sub-agent delegation
+6. **Fixed Scheduling**: PM session targeting ensures notifications reach the correct location
 
 ## Development
 
