@@ -10,11 +10,17 @@ export class Scheduler {
         const taskId = `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         const now = new Date();
         const executeAt = new Date(now.getTime() + options.minutes * 60 * 1000);
+        // Determine target window - prioritize PM session info, then target_window, then default
+        let targetWindow = options.target_window || 'tmux-orc:0';
+        if (options.pm_session_name) {
+            const windowIndex = options.pm_window_index || 0;
+            targetWindow = `${options.pm_session_name}:${windowIndex}`;
+        }
         const task = {
             id: taskId,
             minutes: options.minutes,
             note: options.note,
-            target_window: options.target_window || 'tmux-orc:0',
+            target_window: targetWindow,
             scheduled_at: now,
             execute_at: executeAt,
             status: 'pending'
@@ -91,7 +97,7 @@ export class Scheduler {
     getActiveTasks() {
         return Array.from(this.tasks.values()).filter(task => task.status === 'pending' || task.status === 'running');
     }
-    async scheduleProgressReview(sessionName, minutes = 30) {
+    async scheduleProgressReview(sessionName, minutes = 30, pmSessionName, pmWindowIndex) {
         const note = `Progress review for session: ${sessionName}\n` +
             `Please provide status update:\n` +
             `1. Completed tasks\n` +
@@ -101,19 +107,23 @@ export class Scheduler {
         return this.scheduleTask({
             minutes,
             note,
-            target_window: `${sessionName}:0`
+            target_window: `${sessionName}:0`,
+            pm_session_name: pmSessionName,
+            pm_window_index: pmWindowIndex
         });
     }
-    async scheduleOrchestratorCheck(minutes = 15) {
+    async scheduleOrchestratorCheck(minutes = 15, pmSessionName, pmWindowIndex) {
         const note = `Regular orchestrator oversight check\n` +
             `Review all active sessions and provide status summary`;
         return this.scheduleTask({
             minutes,
             note,
-            target_window: 'tmux-orc:0'
+            target_window: 'tmux-orc:0',
+            pm_session_name: pmSessionName,
+            pm_window_index: pmWindowIndex
         });
     }
-    async scheduleEngineerStandup(sessionName, minutes = 480) {
+    async scheduleEngineerStandup(sessionName, minutes = 480, pmSessionName, pmWindowIndex) {
         const note = `Daily standup for engineer: ${sessionName}\n` +
             `Please provide:\n` +
             `- Yesterday's accomplishments\n` +
@@ -122,7 +132,9 @@ export class Scheduler {
         return this.scheduleTask({
             minutes,
             note,
-            target_window: `${sessionName}:0`
+            target_window: `${sessionName}:0`,
+            pm_session_name: pmSessionName,
+            pm_window_index: pmWindowIndex
         });
     }
 }

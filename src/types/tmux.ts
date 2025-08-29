@@ -40,6 +40,8 @@ export interface ScheduleOptions {
   minutes: number;
   note: string;
   target_window?: string;
+  pm_session_name?: string;
+  pm_window_index?: number;
 }
 
 export interface MessageOptions {
