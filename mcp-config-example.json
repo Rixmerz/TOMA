@@ -1,0 +1,46 @@
+{
+  "mcpServers": {
+    "toma": {
+      "command": "node",
+      "args": ["/Users/juanpablodiaz/my_projects/TOMA/dist/index.js", "--stdio"],
+      "env": {
+        "NODE_ENV": "production",
+        "TOMA_LOG_LEVEL": "info",
+        "TOMA_SAFETY_MODE": "true",
+        "TOMA_MAX_LINES_CAPTURE": "1000",
+        "TOMA_DEFAULT_SCHEDULE_MINUTES": "15"
+      }
+    },
+    "rixa": {
+      "command": "node",
+      "args": ["/Users/juanpablodiaz/my_projects/RIXA/dist/index.js", "--stdio"],
+      "env": {
+        "RIXA_AUTH_ENABLED": "false",
+        "RIXA_FS_ALLOWED_PATHS": "/Users/juanpablodiaz/my_projects",
+        "RIXA_LOG_LEVEL": "error",
+        "RIXA_LOG_FILE": "/tmp/rixa.log"
+      }
+    },
+    "risa": {
+      "command": "node",
+      "args": ["/Users/juanpablodiaz/my_projects/RISA/build/index.js"],
+      "env": {
+        "NODE_ENV": "production",
+        "RISA_LOG_LEVEL": "info",
+        "RISA_MAX_CONCURRENT_SCANS": "5",
+        "RISA_TIMEOUT": "300000",
+        "RISA_ENABLE_CACHE": "true"
+      }
+    },
+    "rika": {
+      "command": "node",
+      "args": ["/Users/juanpablodiaz/my_projects/RIKA/src/index.js"],
+      "env": {"NODE_ENV": "production"}
+    },
+    "rima": {
+      "command": "node",
+      "args": ["/Users/juanpablodiaz/my_projects/RIMA/dist/index.js"],
+      "env": {"NODE_ENV": "production"}
+    }
+  }
+}
