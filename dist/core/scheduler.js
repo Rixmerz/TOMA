@@ -53,7 +53,7 @@ export class Scheduler {
             const seconds = task.minutes * 60;
             const command = [
                 'bash', '-c',
-                `sleep ${seconds} && tmux send-keys -t "${task.target_window}" "Time for orchestrator check! cat ${this.noteFilePath}" && sleep 1 && tmux send-keys -t "${task.target_window}" Enter`
+                `sleep ${seconds} && tmux send-keys -t "${task.target_window}" "cat ${this.noteFilePath}" && sleep 1 && tmux send-keys -t "${task.target_window}" Enter`
             ];
             const child = spawn(command[0], command.slice(1), {
                 detached: true,
