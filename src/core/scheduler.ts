@@ -74,12 +74,15 @@ export class Scheduler {
     try {
       const seconds = task.minutes * 60;
 
-      // Create a script that will read the note file and send its content directly
+      // Create a script that will read the note file and send its content safely (no auto-run)
       const scriptContent = `#!/bin/bash
 sleep ${seconds}
 if [ -f "${this.noteFilePath}" ]; then
-  NOTE_CONTENT=$(cat "${this.noteFilePath}")
-  tmux send-keys -t "${task.target_window}" "$NOTE_CONTENT"
+  # Sanitize any leading "$ " to avoid auto-run in chat UIs
+  SAFE_CONTENT=$(sed 's/^\$ /＄ /' "${this.noteFilePath}")
+  # Use tmux buffer to paste multi-line content reliably
+  tmux set-buffer -- "$SAFE_CONTENT"
+  tmux paste-buffer -t "${task.target_window}"
   sleep 1
   tmux send-keys -t "${task.target_window}" Enter
 else

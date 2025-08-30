@@ -164,6 +164,11 @@ await mcp.callTool('broadcast_message', {
 });
 ```
 
+### Strategic Session Usage Example
+
+You are currently in the tmux session called: `<session_name>`; take on the role of `<role>`; use the 'toma' tools, create an `<engineer>` and give them `<instructions or path with instructions>`, make them create a default `<project_type>` project — that is the only goal. And for yourself, create a `<schedule_duration>` schedule.
+
+
 ## PM Session Targeting
 
 ### Problem Solved
@@ -277,4 +282,16 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## Support
 
-For issues, questions, or contributions, please visit the [GitHub repository](https://github.com/Rixmerz/TOMA).
+For issues, questions, or contributions, please visit the [GitHub repository](https://github.com/Rixmerz/TOMA or https://discord.gg/Q2M3evzt I'm active in mcp or general channels).
+
+## ⚠️ Known Issues
+
+### 🚨 Recurrent Issue: augment-cursor MCP Execution
+
+There is a recurrent issue with **cursor-agent** where it sometimes fails to execute MCP correctly. This is not a bug in MCP itself, but rather a "skill issue" depending on the agent assigned (especially if agent selection is set to auto). If the process freezes or gets stuck, simply resend the message—eventually, an agent with sufficient MCP handling skills will be assigned and the problem will resolve itself.
+
+- This is not a TOMA or MCP error.
+- If stuck, just retry until a capable agent is assigned.
+- No further action is needed; the issue is agent-dependent.
+
+🚨 If you encounter this, do **not** report it as a bug—it's a known limitation of agent skill variance!
