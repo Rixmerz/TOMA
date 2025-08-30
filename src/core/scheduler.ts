@@ -73,10 +73,22 @@ export class Scheduler {
   private async scheduleSystemTask(task: ScheduledTask): Promise<boolean> {
     try {
       const seconds = task.minutes * 60;
-      const command = [
-        'bash', '-c',
-        `sleep ${seconds} && tmux send-keys -t "${task.target_window}" "cat ${this.noteFilePath}" && sleep 1 && tmux send-keys -t "${task.target_window}" Enter`
-      ];
+
+      // Create a script that will read the note file and send its content directly
+      const scriptContent = `#!/bin/bash
+sleep ${seconds}
+if [ -f "${this.noteFilePath}" ]; then
+  NOTE_CONTENT=$(cat "${this.noteFilePath}")
+  tmux send-keys -t "${task.target_window}" "$NOTE_CONTENT"
+  sleep 1
+  tmux send-keys -t "${task.target_window}" Enter
+else
+  tmux send-keys -t "${task.target_window}" "Scheduled task completed - note file not found"
+  sleep 1
+  tmux send-keys -t "${task.target_window}" Enter
+fi`;
+
+      const command = ['bash', '-c', scriptContent];
 
       const child = spawn(command[0], command.slice(1), {
         detached: true,
@@ -84,10 +96,10 @@ export class Scheduler {
       });
 
       child.unref();
-      
+
       task.pid = child.pid;
       task.status = 'running';
-      
+
       return true;
     } catch (error) {
       console.error('Error scheduling system task:', error);
